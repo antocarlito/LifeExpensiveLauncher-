@@ -1,0 +1,13 @@
+bin/
+obj/
+publish/
+installer/
+installer_assets/
+media/
+*.user
+*.suo
+.vs/
+*.exe
+*.dll
+*.pdb
+crash.log

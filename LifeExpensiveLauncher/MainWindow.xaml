@@ -1,0 +1,638 @@
+<Window x:Class="LifeExpensiveLauncher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="LifeExpensive RP - Launcher" Height="720" Width="1100"
+        MinHeight="600" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgDarkBrush}" WindowStyle="None"
+        AllowsTransparency="True" ResizeMode="CanResize"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="0" ResizeBorderThickness="6"
+                            CornerRadius="12" GlassFrameThickness="0"/>
+    </shell:WindowChrome.WindowChrome>
+
+    <Border CornerRadius="12" Background="{StaticResource BgDarkBrush}"
+            BorderBrush="#333355" BorderThickness="1" ClipToBounds="True">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="42"/>
+                <RowDefinition Height="3"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="70"/>
+            </Grid.RowDefinitions>
+
+            <!-- ==================== FOND ==================== -->
+            <MediaElement x:Name="BgVideo" Grid.RowSpan="5" Stretch="UniformToFill"
+                          LoadedBehavior="Manual" UnloadedBehavior="Manual"
+                          MediaEnded="BgVideo_MediaEnded" MediaOpened="BgVideo_MediaOpened"
+                          Visibility="Collapsed" IsHitTestVisible="False"/>
+            <Image x:Name="BgImage" Grid.RowSpan="5" Stretch="UniformToFill"
+                   Visibility="Collapsed" IsHitTestVisible="False"/>
+            <Border x:Name="BgOverlay" Grid.RowSpan="5" IsHitTestVisible="False">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#BB0D0D1A" Offset="0"/>
+                        <GradientStop Color="#770D0D1A" Offset="0.3"/>
+                        <GradientStop Color="#770D0D1A" Offset="0.7"/>
+                        <GradientStop Color="#CC0D0D1A" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+
+            <!-- ==================== BARRE TITRE ==================== -->
+            <Border Grid.Row="0" CornerRadius="12,12,0,0">
+                <Border.Background>
+                    <SolidColorBrush Color="#0A0A1E" Opacity="0.95"/>
+                </Border.Background>
+                <Grid>
+                    <!-- Logo -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0">
+                        <TextBlock Text="LIFE" FontSize="18" FontWeight="Bold"
+                                   Foreground="{StaticResource CyanBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="EXPENSIVE" FontSize="18" FontWeight="Bold"
+                                   Foreground="White" VerticalAlignment="Center" Margin="2,0,0,0"/>
+                        <TextBlock Text=" RP" FontSize="12" Foreground="{StaticResource OrangeBrush}"
+                                   VerticalAlignment="Center" FontWeight="SemiBold"/>
+                    </StackPanel>
+
+                    <!-- Musique en cours (centre) -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock x:Name="NowPlayingText" Text=""
+                                   Foreground="{StaticResource TextDimBrush}" FontSize="11"
+                                   MaxWidth="300" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+
+                    <!-- Controles droite -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                                VerticalAlignment="Center" Margin="0,0,6,0">
+                        <!-- Musique -->
+                        <Button x:Name="BtnPrev" Content="⏮" Click="BtnPrev_Click"
+                                Style="{StaticResource WindowButton}" ToolTip="Musique precedente" Width="30"/>
+                        <Button x:Name="BtnNext" Content="⏭" Click="BtnNext_Click"
+                                Style="{StaticResource WindowButton}" ToolTip="Musique suivante" Width="30"/>
+                        <!-- Volume slider -->
+                        <Slider x:Name="VolumeSlider" Width="60" Minimum="0" Maximum="1" Value="0.3"
+                                VerticalAlignment="Center" Margin="4,0"
+                                ValueChanged="VolumeSlider_ValueChanged" ToolTip="Volume"/>
+                        <Button x:Name="BtnMute" Content="🔊" Click="BtnMute_Click"
+                                Style="{StaticResource WindowButton}" ToolTip="Son on/off" Width="30"/>
+                        <Border Width="1" Background="#333" Margin="4,8" VerticalAlignment="Stretch"/>
+                        <!-- Paramètres -->
+                        <Button Content="⚙" Click="BtnSettings_Click"
+                                Style="{StaticResource WindowButton}" ToolTip="Parametres" Width="30"/>
+                        <!-- Journal -->
+                        <Button x:Name="BtnToggleLog" Content="📋" Click="BtnToggleLog_Click"
+                                Style="{StaticResource WindowButton}" ToolTip="Journal" Width="30"/>
+                        <Border Width="1" Background="#333" Margin="4,8" VerticalAlignment="Stretch"/>
+                        <!-- Fenetre -->
+                        <Button Content="—" Click="BtnMinimize_Click"
+                                Style="{StaticResource WindowButton}"/>
+                        <Button Content="✕" Click="BtnClose_Click"
+                                Style="{StaticResource CloseButton}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ==================== GRADIENT BAR ==================== -->
+            <Border Grid.Row="1" Background="{StaticResource GradientFull}"/>
+
+            <!-- ==================== CONTENU PRINCIPAL ==================== -->
+            <Grid x:Name="MainContent" Grid.Row="2" Margin="16,12,16,8" Opacity="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="310"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ===== COLONNE GAUCHE ===== -->
+                <Grid Grid.Column="0" Margin="0,0,12,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Liens rapides -->
+                    <Border Grid.Row="0" CornerRadius="10" Padding="10,8" Margin="0,0,0,10">
+                        <Border.Background>
+                            <SolidColorBrush Color="{StaticResource BgCardColor}" Opacity="0.9"/>
+                        </Border.Background>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0" Style="{StaticResource LinkButton}" Click="BtnTeamSpeak_Click"
+                                    Margin="0,0,4,0" ToolTip="Rejoindre le TeamSpeak">
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="22" Height="22" CornerRadius="4" Margin="0,0,8,0" Background="#2580C3">
+                                        <TextBlock Text="TS" FontSize="9" FontWeight="ExtraBold" Foreground="White"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="TeamSpeak" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Grid.Column="1" Style="{StaticResource LinkButton}" Click="BtnDiscord_Click"
+                                    Margin="4,0,4,0" ToolTip="Rejoindre le Discord">
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="22" Height="22" CornerRadius="4" Margin="0,0,8,0" Background="#5865F2">
+                                        <TextBlock Text="DC" FontSize="9" FontWeight="ExtraBold" Foreground="White"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Discord" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Grid.Column="2" Style="{StaticResource LinkButton}" Click="BtnWebsite_Click"
+                                    Margin="4,0,4,0" ToolTip="lifeexpensive.com">
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="22" Height="22" CornerRadius="11" Margin="0,0,8,0">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                <GradientStop Color="{StaticResource CyanColor}" Offset="0"/>
+                                                <GradientStop Color="{StaticResource OrangeColor}" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <TextBlock Text="LE" FontSize="8" FontWeight="ExtraBold" Foreground="White"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock Text="Site Web" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button Grid.Column="3" x:Name="BtnTFR" Style="{StaticResource LinkButton}"
+                                    Click="BtnInstallTFR_Click" Margin="4,0,0,0" ToolTip="Installer TFR pour TeamSpeak">
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="22" Height="22" CornerRadius="4" Margin="0,0,8,0" Background="#E67E22">
+                                        <TextBlock Text="📻" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock x:Name="TfrStatusText" Text="Installer TFR" FontSize="12"
+                                               FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- Actualites + Changelog -->
+                    <Border Grid.Row="1" CornerRadius="10" Padding="16,12">
+                        <Border.Background>
+                            <SolidColorBrush Color="{StaticResource BgCardColor}" Opacity="0.85"/>
+                        </Border.Background>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Button x:Name="TabNews" Content="ACTUALITES" Click="TabNews_Click"
+                                        Style="{StaticResource WindowButton}" Height="26" Width="Auto"
+                                        FontSize="12" FontWeight="Bold" Foreground="{StaticResource CyanBrush}"/>
+                                <TextBlock Text="|" Foreground="#333" Margin="6,0" VerticalAlignment="Center"/>
+                                <Button x:Name="TabChangelog" Content="MISES A JOUR" Click="TabChangelog_Click"
+                                        Style="{StaticResource WindowButton}" Height="26" Width="Auto"
+                                        FontSize="12" FontWeight="Bold" Foreground="{StaticResource TextDimBrush}"/>
+                            </StackPanel>
+
+                            <ScrollViewer x:Name="NewsPanel" Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl x:Name="NewsList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="6" Padding="10,7" Margin="0,0,0,5">
+                                                <Border.Background><SolidColorBrush Color="#0F0F28" Opacity="0.9"/></Border.Background>
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Date}" Foreground="{StaticResource TextDimBrush}"
+                                                                   FontSize="10" Margin="0,0,10,0"/>
+                                                        <TextBlock Text="{Binding Title}" Foreground="White"
+                                                                   FontSize="11" FontWeight="SemiBold"/>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Content}" Foreground="{StaticResource TextDimBrush}"
+                                                               FontSize="10.5" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                            <ScrollViewer x:Name="ChangelogPanel" Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                                          Visibility="Collapsed">
+                                <ItemsControl x:Name="ChangelogList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border CornerRadius="6" Padding="10,7" Margin="0,0,0,5">
+                                                <Border.Background><SolidColorBrush Color="#0F0F28" Opacity="0.9"/></Border.Background>
+                                                <StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Border Background="{StaticResource IndigoBrush}" CornerRadius="3"
+                                                                Padding="6,2" Margin="0,0,8,0">
+                                                            <TextBlock Text="{Binding Version}" Foreground="White"
+                                                                       FontSize="9" FontWeight="Bold"/>
+                                                        </Border>
+                                                        <TextBlock Text="{Binding Date}" Foreground="{StaticResource TextDimBrush}"
+                                                                   FontSize="10" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                        <TextBlock Text="{Binding Title}" Foreground="{StaticResource OrangeBrush}"
+                                                                   FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <ItemsControl ItemsSource="{Binding Changes}" Margin="4,4,0,0">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,1">
+                                                                    <TextBlock Text="•" Foreground="{StaticResource CyanBrush}"
+                                                                               FontSize="10" Margin="0,0,6,0"/>
+                                                                    <TextBlock Text="{Binding}" Foreground="{StaticResource TextDimBrush}"
+                                                                               FontSize="10.5" TextWrapping="Wrap"/>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- ===== COLONNE DROITE ===== -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Joueurs en ligne -->
+                    <Border Grid.Row="0" CornerRadius="10" Padding="16,12" Margin="0,0,0,10">
+                        <Border.Background><SolidColorBrush Color="{StaticResource BgCardColor}" Opacity="0.9"/></Border.Background>
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="SERVEUR" FontSize="11" FontWeight="Bold"
+                                           Foreground="{StaticResource TextDimBrush}" Margin="0,0,0,4"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock x:Name="PlayerCountText" Text="--" FontSize="32" FontWeight="Bold"
+                                               Foreground="{StaticResource CyanBrush}"/>
+                                    <TextBlock x:Name="PlayerMaxText" Text=" / --" FontSize="16"
+                                               Foreground="{StaticResource TextDimBrush}"
+                                               VerticalAlignment="Bottom" Margin="2,0,0,6"/>
+                                </StackPanel>
+                                <TextBlock Text="joueurs en ligne" FontSize="10"
+                                           Foreground="{StaticResource TextDimBrush}" Margin="0,-2,0,0"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top">
+                                <Ellipse x:Name="ServerStatusDot" Width="10" Height="10" Fill="#555"/>
+                                <Ellipse x:Name="ServerDotBig" Width="10" Height="10" Fill="#555" Visibility="Collapsed"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Mods -->
+                    <Border Grid.Row="1" CornerRadius="10" Padding="16,12" Margin="0,0,0,10">
+                        <Border.Background><SolidColorBrush Color="{StaticResource BgCardColor}" Opacity="0.9"/></Border.Background>
+                        <StackPanel>
+                            <TextBlock Text="MODS" FontSize="13" FontWeight="Bold"
+                                       Foreground="{StaticResource IndigoLightBrush}" Margin="0,0,0,8"/>
+                            <Border x:Name="ModStatusBorder" CornerRadius="8" Padding="12,8">
+                                <Border.Background><SolidColorBrush Color="#0F0F28" Opacity="0.9"/></Border.Background>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock x:Name="ModStatusTitle" Text="@lifeexpensive_modspack"
+                                                   Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                                        <TextBlock x:Name="ModStatusDetail" Text="Verification..."
+                                                   Foreground="{StaticResource TextDimBrush}" FontSize="10.5" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                    <Ellipse x:Name="ModStatusDot" Grid.Column="1" Width="12" Height="12"
+                                             Fill="{StaticResource TextDimBrush}" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            <StackPanel x:Name="DownloadPanel" Visibility="Collapsed" Margin="0,10,0,0">
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock x:Name="DownloadFileName" Foreground="{StaticResource TextBrush}"
+                                               FontSize="10.5" HorizontalAlignment="Left"/>
+                                    <TextBlock x:Name="DownloadSpeed" Foreground="{StaticResource CyanBrush}"
+                                               FontSize="10.5" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <ProgressBar x:Name="DownloadProgress" Style="{StaticResource ModernProgressBar}"
+                                             Minimum="0" Maximum="100" Value="0"/>
+                                <Grid Margin="0,3,0,0">
+                                    <TextBlock x:Name="DownloadCount" Foreground="{StaticResource TextDimBrush}"
+                                               FontSize="9" HorizontalAlignment="Left"/>
+                                    <TextBlock x:Name="DownloadSize" Foreground="{StaticResource TextDimBrush}"
+                                               FontSize="9" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </StackPanel>
+                            <Button x:Name="BtnCheckMods" Content="Verifier les mods"
+                                    Style="{StaticResource CyanButton}" Margin="0,10,0,0"
+                                    Click="BtnCheckMods_Click" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Anti-triche -->
+                    <Border Grid.Row="2" CornerRadius="10" Padding="16,12">
+                        <Border.Background><SolidColorBrush Color="{StaticResource BgCardColor}" Opacity="0.9"/></Border.Background>
+                        <StackPanel>
+                            <TextBlock Text="ANTI-TRICHE" FontSize="13" FontWeight="Bold"
+                                       Foreground="{StaticResource OrangeBrush}" Margin="0,0,0,8"/>
+                            <Border CornerRadius="8" Padding="12,8" Margin="0,0,0,6">
+                                <Border.Background><SolidColorBrush Color="#0F0F28" Opacity="0.9"/></Border.Background>
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,3">
+                                        <TextBlock Text="PBOs scannes" Foreground="{StaticResource TextDimBrush}" FontSize="10.5"/>
+                                        <TextBlock x:Name="ScanPboCount" Text="-" Foreground="White" FontSize="10.5"
+                                                   FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,3">
+                                        <TextBlock Text="Fichiers scannes" Foreground="{StaticResource TextDimBrush}" FontSize="10.5"/>
+                                        <TextBlock x:Name="ScanFileCount" Text="-" Foreground="White" FontSize="10.5"
+                                                   FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,3">
+                                        <TextBlock Text="Fichiers suspects" Foreground="{StaticResource TextDimBrush}" FontSize="10.5"/>
+                                        <TextBlock x:Name="ScanSuspicious" Text="-" Foreground="White" FontSize="10.5"
+                                                   FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                    <Grid>
+                                        <TextBlock Text="Token" Foreground="{StaticResource TextDimBrush}" FontSize="10.5"/>
+                                        <TextBlock x:Name="ScanTokenStatus" Text="-" Foreground="White" FontSize="10.5"
+                                                   FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            <ProgressBar x:Name="ScanProgress" Style="{StaticResource ModernProgressBar}"
+                                         Visibility="Collapsed" IsIndeterminate="True" Margin="0,0,0,6"/>
+                            <TextBlock x:Name="ScanStatusText" Text="" Foreground="{StaticResource TextDimBrush}"
+                                       FontSize="10.5" TextAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- ==================== JOURNAL (OVERLAY TOGGLE) ==================== -->
+            <Border x:Name="LogPanel" Grid.Row="2" Visibility="Collapsed"
+                    Margin="16,12,16,8" CornerRadius="10" Padding="16,12">
+                <Border.Background>
+                    <SolidColorBrush Color="#0D0D1A" Opacity="0.95"/>
+                </Border.Background>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="JOURNAL" FontSize="14" FontWeight="Bold"
+                                   Foreground="{StaticResource OrangeBrush}"/>
+                        <Button Content="✕ Fermer" Click="BtnToggleLog_Click"
+                                Style="{StaticResource WindowButton}" FontSize="11"
+                                Foreground="{StaticResource TextDimBrush}" Margin="15,0,0,0"
+                                HorizontalAlignment="Right" Width="Auto"/>
+                    </StackPanel>
+                    <TextBox x:Name="LogTextBox" Grid.Row="1" IsReadOnly="True"
+                             Foreground="{StaticResource TextDimBrush}" Background="Transparent"
+                             FontSize="10.5" FontFamily="Consolas" TextWrapping="Wrap"
+                             BorderThickness="0" VerticalScrollBarVisibility="Auto"
+                             SelectionBrush="{StaticResource CyanBrush}"
+                             CaretBrush="Transparent" Cursor="IBeam"/>
+                </Grid>
+            </Border>
+
+            <!-- ==================== PARAMETRES (OVERLAY TOGGLE) ==================== -->
+            <Border x:Name="SettingsPanel" Grid.Row="2" Visibility="Collapsed"
+                    Margin="16,12,16,8" CornerRadius="10" Padding="20,16"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    MinWidth="400" MaxWidth="500">
+                <Border.Background>
+                    <SolidColorBrush Color="#0D0D1A" Opacity="0.97"/>
+                </Border.Background>
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="30" ShadowDepth="0" Opacity="0.5"/>
+                </Border.Effect>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                        <TextBlock Text="PARAMETRES" FontSize="16" FontWeight="Bold"
+                                   Foreground="{StaticResource CyanBrush}"/>
+                        <Button Content="✕" Click="BtnSettings_Click"
+                                Style="{StaticResource CloseButton}" Margin="15,0,0,0"
+                                Width="30" Height="26" HorizontalAlignment="Right"/>
+                    </StackPanel>
+
+                    <TextBlock Text="Chemin Arma 3" Foreground="{StaticResource TextDimBrush}"
+                               FontSize="11" Margin="0,0,0,4"/>
+                    <Border Background="#111128" CornerRadius="6" Padding="10,8" Margin="0,0,0,12"
+                            Cursor="Hand" MouseLeftButtonDown="ArmaPathText_Click">
+                        <TextBlock x:Name="ArmaPathText" Text="Non detecte" Foreground="{StaticResource CyanBrush}"
+                                   FontSize="11" TextTrimming="CharacterEllipsis" TextDecorations="Underline"/>
+                    </Border>
+
+                    <TextBlock Text="Dossier mods" Foreground="{StaticResource TextDimBrush}"
+                               FontSize="11" Margin="0,0,0,4"/>
+                    <Border Background="#111128" CornerRadius="6" Padding="10,8" Margin="0,0,0,12"
+                            Cursor="Hand" MouseLeftButtonDown="ModsPathText_Click">
+                        <TextBlock x:Name="ModsPathText" Text="Non configure" Foreground="{StaticResource CyanBrush}"
+                                   FontSize="11" TextTrimming="CharacterEllipsis" TextDecorations="Underline"/>
+                    </Border>
+
+                    <TextBlock Text="Serveur" Foreground="{StaticResource TextDimBrush}"
+                               FontSize="11" Margin="0,0,0,4"/>
+                    <Border Background="#111128" CornerRadius="6" Padding="10,8">
+                        <StackPanel>
+                            <TextBlock x:Name="ServerInfoText" Text="185.44.80.36:2312"
+                                       Foreground="{StaticResource TextBrush}" FontSize="11"/>
+                            <TextBlock x:Name="ServerStatusInfo" Text=""
+                                       Foreground="{StaticResource TextDimBrush}" FontSize="10" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== BANDEAU MAINTENANCE / WHITELIST ==================== -->
+            <Border x:Name="MaintenanceBanner" Grid.Row="3" Visibility="Collapsed"
+                    Margin="16,0,16,4" CornerRadius="8" Padding="14,8" Cursor="Hand"
+                    MouseLeftButtonDown="MaintenanceBanner_Click">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                        <GradientStop Color="#CC8800" Offset="0"/>
+                        <GradientStop Color="#AA6600" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="⚠" FontSize="16" Foreground="White" Margin="0,0,10,0"/>
+                        <TextBlock x:Name="MaintenanceBannerText" Text="MAINTENANCE EN COURS"
+                                   Foreground="White" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Cliquer pour plus d'infos >" Foreground="#FFDDAA" FontSize="10"
+                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+
+            <Border x:Name="WhitelistBanner" Grid.Row="3" Visibility="Collapsed"
+                    Margin="16,0,16,4" CornerRadius="8" Padding="14,8" Cursor="Hand"
+                    MouseLeftButtonDown="WhitelistBanner_Click">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                        <GradientStop Color="{StaticResource IndigoColor}" Offset="0"/>
+                        <GradientStop Color="{StaticResource CyanColor}" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="🔒" FontSize="16" Foreground="White" Margin="0,0,10,0"/>
+                        <TextBlock Text="SERVEUR WHITELIST - Inscrivez-vous sur le site"
+                                   Foreground="White" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Cliquer pour s'inscrire >" Foreground="#AADDFF" FontSize="10"
+                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+
+            <!-- ==================== BARRE PROGRESSION GLOBALE ==================== -->
+            <StackPanel x:Name="GlobalProgressPanel" Grid.Row="3" Visibility="Collapsed" Margin="16,0,16,4">
+                <Grid Margin="0,0,0,2">
+                    <TextBlock x:Name="GlobalProgressText" Text="" Foreground="{StaticResource TextDimBrush}"
+                               FontSize="10" HorizontalAlignment="Left"/>
+                    <TextBlock x:Name="GlobalProgressPercent" Text="" Foreground="{StaticResource CyanBrush}"
+                               FontSize="10" HorizontalAlignment="Right"/>
+                </Grid>
+                <ProgressBar x:Name="GlobalProgress" Style="{StaticResource ModernProgressBar}"
+                             Minimum="0" Maximum="100" Value="0" Height="4"/>
+            </StackPanel>
+
+            <!-- ==================== BARRE DU BAS ==================== -->
+            <Border Grid.Row="4" CornerRadius="0,0,12,12">
+                <Border.Background>
+                    <SolidColorBrush Color="#0A0A1E" Opacity="0.95"/>
+                </Border.Background>
+                <Grid Margin="20,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <Ellipse x:Name="ServerStatusDotBottom" Width="8" Height="8" Fill="#555" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="ServerStatusText" Text="Connexion..."
+                                   Foreground="{StaticResource TextDimBrush}" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Text="  |  " Foreground="#333" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Text="lifeexpensive.com" Foreground="{StaticResource OrangeBrush}" FontSize="11"
+                                   Cursor="Hand" MouseLeftButtonDown="OpenWebsite_Click"
+                                   TextDecorations="Underline" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button x:Name="BtnPlay" Content="▶  JOUER" Style="{StaticResource PlayButton}"
+                            HorizontalAlignment="Right" VerticalAlignment="Center"
+                            Click="BtnPlay_Click" IsEnabled="False"/>
+                </Grid>
+            </Border>
+
+            <!-- ==================== POPUP MESSAGE ==================== -->
+            <Grid x:Name="PopupOverlay" Grid.RowSpan="5" Visibility="Collapsed" Panel.ZIndex="90"
+                  MouseLeftButtonDown="PopupOverlay_Close">
+                <Border Background="#AA000000"/>
+                <Border x:Name="PopupBox" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        MinWidth="400" MaxWidth="550" CornerRadius="12" Padding="28,24"
+                        MouseLeftButtonDown="PopupBox_Click">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#1A1A35" Offset="0"/>
+                            <GradientStop Color="#0D0D1A" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="40" ShadowDepth="0" Opacity="0.6" Color="#2200CC"/>
+                    </Border.Effect>
+                    <Border.BorderBrush>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="{StaticResource IndigoColor}" Offset="0"/>
+                            <GradientStop Color="{StaticResource CyanColor}" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.BorderBrush>
+                    <Border.BorderThickness>
+                        <Thickness>1</Thickness>
+                    </Border.BorderThickness>
+                    <StackPanel>
+                        <!-- Icone + Titre -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <TextBlock x:Name="PopupIcon" Text="⚠" FontSize="24" Margin="0,0,12,0"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock x:Name="PopupTitle" Text="Information" FontSize="18" FontWeight="Bold"
+                                       Foreground="{StaticResource CyanBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <!-- Barre gradient -->
+                        <Border Height="2" CornerRadius="1" Margin="0,0,0,16"
+                                Background="{StaticResource GradientFull}"/>
+                        <!-- Message -->
+                        <TextBlock x:Name="PopupMessage" Text="" Foreground="{StaticResource TextBrush}"
+                                   FontSize="13" TextWrapping="Wrap" LineHeight="22" Margin="0,0,0,20"/>
+                        <!-- Bouton OK -->
+                        <Button Content="OK" Style="{StaticResource PlayButton}"
+                                HorizontalAlignment="Center" Click="PopupOk_Click"
+                                Padding="40,10" FontSize="14"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ==================== SPLASH ==================== -->
+            <Grid x:Name="SplashScreen" Grid.RowSpan="5" Background="#0D0D1A" Panel.ZIndex="100">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Border Grid.RowSpan="5" IsHitTestVisible="False">
+                    <Border.Background>
+                        <RadialGradientBrush Center="0.5,0.4" RadiusX="0.8" RadiusY="0.8">
+                            <GradientStop Color="#1A1A40" Offset="0"/>
+                            <GradientStop Color="#0D0D1A" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Border.Background>
+                </Border>
+                <Border Grid.Row="1" Height="3" Width="300" CornerRadius="2" Margin="0,0,0,20">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                            <GradientStop Color="Transparent" Offset="0"/>
+                            <GradientStop Color="{StaticResource IndigoColor}" Offset="0.2"/>
+                            <GradientStop Color="{StaticResource CyanColor}" Offset="0.5"/>
+                            <GradientStop Color="{StaticResource OrangeColor}" Offset="0.8"/>
+                            <GradientStop Color="Transparent" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+                <StackPanel Grid.Row="2" HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="LIFE" FontSize="52" FontWeight="Bold" Foreground="{StaticResource CyanBrush}"/>
+                        <TextBlock Text="EXPENSIVE" FontSize="52" FontWeight="Bold" Foreground="White" Margin="4,0,0,0"/>
+                    </StackPanel>
+                    <TextBlock Text="R  O  L  E  P  L  A  Y" FontSize="18" FontWeight="Light"
+                               Foreground="{StaticResource OrangeBrush}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    <Border Height="3" Width="300" CornerRadius="2" Margin="0,20,0,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                <GradientStop Color="Transparent" Offset="0"/>
+                                <GradientStop Color="{StaticResource OrangeColor}" Offset="0.2"/>
+                                <GradientStop Color="{StaticResource CyanColor}" Offset="0.5"/>
+                                <GradientStop Color="{StaticResource IndigoColor}" Offset="0.8"/>
+                                <GradientStop Color="Transparent" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                </StackPanel>
+                <StackPanel Grid.Row="3" HorizontalAlignment="Center" Margin="0,40,0,0">
+                    <TextBlock x:Name="SplashStatus" Text="Chargement..."
+                               Foreground="{StaticResource TextDimBrush}" FontSize="13" HorizontalAlignment="Center"/>
+                    <ProgressBar x:Name="SplashProgress" Style="{StaticResource ModernProgressBar}"
+                                 Width="250" Margin="0,12,0,0" IsIndeterminate="True"/>
+                    <TextBlock Text="v1.0.0" Foreground="#333" FontSize="10"
+                               HorizontalAlignment="Center" Margin="0,20,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
