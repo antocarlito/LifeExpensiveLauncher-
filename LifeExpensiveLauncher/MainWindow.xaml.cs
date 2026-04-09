@@ -186,6 +186,7 @@ namespace LifeExpensiveLauncher
         private string _maintenanceMessage = "";
         private string _whitelistMessage = "";
         private bool _isWhitelistMode;
+        private bool _isWhitelistBlocked;
 
         private async Task CheckMaintenanceAsync()
         {
@@ -219,19 +220,36 @@ namespace LifeExpensiveLauncher
 
                     _isMaintenanceMode = maint && !isStaff;
 
+                    // Verifier whitelist du joueur via API
+                    bool playerWhitelisted = true;
+                    if (whitelist && !isStaff && !string.IsNullOrEmpty(uid))
+                    {
+                        try
+                        {
+                            var wlJson = await http.GetStringAsync(_config.ApiBaseUrl + "/api/launcher_whitelist_check.php?uid=" + uid);
+                            dynamic? wlData = JsonConvert.DeserializeObject(wlJson);
+                            if (wlData != null)
+                            {
+                                playerWhitelisted = (bool)(wlData.whitelisted ?? true);
+                            }
+                        }
+                        catch { playerWhitelisted = true; }
+                    }
+                    _isWhitelistBlocked = whitelist && !isStaff && !playerWhitelisted;
+
                     Dispatcher.Invoke(() =>
                     {
                         // Bandeau maintenance
                         if (maint && !isStaff)
                         {
                             MaintenanceBanner.Visibility = Visibility.Visible;
-                            MaintenanceBannerText.Text = "MAINTENANCE EN COURS";
+                            MaintenanceBannerText.Text = "MAINTENANCE EN COURS — " + msg;
                             AddLog($"MAINTENANCE: {msg}", true);
                         }
                         else if (maint && isStaff)
                         {
                             MaintenanceBanner.Visibility = Visibility.Visible;
-                            MaintenanceBannerText.Text = "MAINTENANCE (Staff autorise)";
+                            MaintenanceBannerText.Text = "MAINTENANCE (Staff) — " + msg;
                             AddLog("Maintenance active (vous etes staff, acces autorise)");
                         }
                         else
@@ -240,7 +258,12 @@ namespace LifeExpensiveLauncher
                         }
 
                         // Bandeau whitelist
-                        if (whitelist && !MaintenanceBanner.IsVisible)
+                        if (_isWhitelistBlocked)
+                        {
+                            WhitelistBanner.Visibility = Visibility.Visible;
+                            AddLog("WHITELIST: Vous n'etes pas whiteliste. Inscrivez-vous sur lifeexpensive.com", true);
+                        }
+                        else if (whitelist && !MaintenanceBanner.IsVisible)
                         {
                             WhitelistBanner.Visibility = Visibility.Visible;
                         }
@@ -248,6 +271,8 @@ namespace LifeExpensiveLauncher
                         {
                             WhitelistBanner.Visibility = Visibility.Collapsed;
                         }
+
+                        UpdatePlayButton();
                     });
                 }
             }
@@ -684,10 +709,14 @@ namespace LifeExpensiveLauncher
 
         private void UpdatePlayButton()
         {
-            BtnPlay.IsEnabled = _modsReady && _scanDone && !string.IsNullOrEmpty(_config.ArmaPath) && !_isMaintenanceMode;
+            BtnPlay.IsEnabled = _modsReady && _scanDone && !string.IsNullOrEmpty(_config.ArmaPath) && !_isMaintenanceMode && !_isWhitelistBlocked;
             if (_isMaintenanceMode)
             {
                 BtnPlay.Content = "MAINTENANCE";
+            }
+            else if (_isWhitelistBlocked)
+            {
+                BtnPlay.Content = "WHITELIST";
             }
             else
             {

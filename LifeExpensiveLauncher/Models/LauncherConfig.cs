@@ -63,7 +63,23 @@ namespace LifeExpensiveLauncher.Models
         public string Title { get; set; } = "";
         public string Content { get; set; } = "";
         public string Date { get; set; } = "";
-        public string Type { get; set; } = "info"; // info, update, alert
+        public string Type { get; set; } = "info"; // info, update, warning, event
+
+        public string TypeLabel => Type switch
+        {
+            "update" => "MISE A JOUR",
+            "warning" => "ALERTE",
+            "event" => "EVENEMENT",
+            _ => "INFO"
+        };
+
+        public System.Windows.Media.SolidColorBrush TypeBrush => Type switch
+        {
+            "update" => new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#28a745")),
+            "warning" => new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#dc3545")),
+            "event" => new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#ff8c00")),
+            _ => new System.Windows.Media.SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#17a2b8"))
+        };
     }
 
     public class ChangelogEntry
