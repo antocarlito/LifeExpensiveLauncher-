@@ -10,8 +10,11 @@
     <AssemblyName>LifeExpensiveLauncher</AssemblyName>
     <RootNamespace>LifeExpensiveLauncher</RootNamespace>
     <Version>1.0.0</Version>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <AssemblyTitle>LifeExpensive RP Launcher</AssemblyTitle>
     <Description>Launcher officiel du serveur LifeExpensive RP</Description>
+    <Authors>Anthony Villain</Authors>
+    <Copyright>Copyright (c) 2026 Anthony Villain</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

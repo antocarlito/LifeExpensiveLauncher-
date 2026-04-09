@@ -1,7 +1,7 @@
 [Setup]
 AppName=LifeExpensive RP Launcher
 AppVersion=1.0.0
-AppPublisher=LifeExpensive RP
+AppPublisher=Anthony Villain
 AppPublisherURL=https://lifeexpensive.com
 DefaultDirName={autopf}\LifeExpensive Launcher
 DefaultGroupName=LifeExpensive RP
