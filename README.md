@@ -30,6 +30,10 @@ Toute la configuration se fait via `launcher_config.json` sur le serveur boot.
 dotnet publish LifeExpensiveLauncher -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
 ```
 
+## Auteur
+
+Anthony Villain (antocarlito)
+
 ## Licence
 
-MIT License
+MIT License - Copyright (c) 2026 Anthony Villain
