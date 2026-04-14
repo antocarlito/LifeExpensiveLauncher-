@@ -27,10 +27,6 @@ namespace LifeExpensiveLauncher.Services
             var path = Path.Combine(AppContext.BaseDirectory, "boot_url.txt");
             if (File.Exists(path))
                 return File.ReadAllText(path).Trim();
-            // Fallback: fichier a cote du .exe
-            path = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "", "boot_url.txt");
-            if (File.Exists(path))
-                return File.ReadAllText(path).Trim();
             return "";
         }
 
