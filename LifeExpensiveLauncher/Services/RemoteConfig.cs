@@ -14,12 +14,25 @@ namespace LifeExpensiveLauncher.Services
     /// </summary>
     public class RemoteConfig
     {
-        // URL du boot serveur (la seule constante en dur dans le launcher)
-        public const string BOOT_URL = "http://87.106.159.231/boot/";
-        public const string CONFIG_URL = BOOT_URL + "launcher_config.json";
+        // URL du boot serveur — chargee depuis boot_url.txt (non committe)
+        // Fallback vide si le fichier n'existe pas
+        public static readonly string BOOT_URL = LoadBootUrl();
+        public static readonly string CONFIG_URL = BOOT_URL + "launcher_config.json";
 
         private readonly HttpClient _http;
         private readonly string _cacheDir;
+
+        private static string LoadBootUrl()
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, "boot_url.txt");
+            if (File.Exists(path))
+                return File.ReadAllText(path).Trim();
+            // Fallback: fichier a cote du .exe
+            path = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "", "boot_url.txt");
+            if (File.Exists(path))
+                return File.ReadAllText(path).Trim();
+            return "";
+        }
 
         public RemoteConfig(string cacheDir)
         {

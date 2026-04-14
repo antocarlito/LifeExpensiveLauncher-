@@ -11,3 +11,8 @@ media/
 *.dll
 *.pdb
 crash.log
+boot_url.txt
+sign_test.bat
+Documentation_Launcher.html
+create_pdf.ps1
+OpenSource_Project.pdf

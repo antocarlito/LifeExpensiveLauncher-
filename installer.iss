@@ -29,6 +29,7 @@ Name: "startmenuicon"; Description: "Creer un raccourci dans le menu Demarrer"; 
 
 [Files]
 Source: "publish\LifeExpensiveLauncher.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\boot_url.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\media\*"; DestDir: "{app}\media"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "music\*"
 
 [Icons]

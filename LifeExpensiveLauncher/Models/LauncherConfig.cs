@@ -4,38 +4,38 @@ namespace LifeExpensiveLauncher.Models
 {
     public class LauncherConfig
     {
-        // Serveur
-        public string ServerHost { get; set; } = "185.44.80.36";
-        public int ServerPort { get; set; } = 2312;
+        // Serveur (valeurs par defaut ecrasees par launcher_config.json distant)
+        public string ServerHost { get; set; } = "0.0.0.0";
+        public int ServerPort { get; set; } = 2302;
         public string ServerPassword { get; set; } = "";
         public string ServerName { get; set; } = "LifeExpensive RP";
 
         // Liens
-        public string TeamSpeakUrl { get; set; } = "ts3server://94.250.223.22?port=15006";
-        public string DiscordUrl { get; set; } = "https://discord.gg/mJXBzEAgAz";
-        public string WebsiteUrl { get; set; } = "https://lifeexpensive.com";
-        public string WhitelistUrl { get; set; } = "https://lifeexpensive.com/whitelist";
+        public string TeamSpeakUrl { get; set; } = "";
+        public string DiscordUrl { get; set; } = "";
+        public string WebsiteUrl { get; set; } = "";
+        public string WhitelistUrl { get; set; } = "";
 
         // API
-        public string ApiBaseUrl { get; set; } = "http://87.106.159.231";
+        public string ApiBaseUrl { get; set; } = "";
         public string ApiTokenEndpoint { get; set; } = "/api/launcher_token.php";
         public string ApiModsEndpoint { get; set; } = "/api/launcher_mods.php";
         public string ApiNewsEndpoint { get; set; } = "/api/launcher_news.php";
-        public string ChangelogUrl { get; set; } = "http://87.106.159.231/boot/changelog.json";
+        public string ChangelogUrl { get; set; } = "";
 
         // Mods
-        public string ModDownloadBaseUrl { get; set; } = "http://87.106.159.231/updater/";
-        public string ModManifestUrl { get; set; } = "http://87.106.159.231/updater/repository.json";
+        public string ModDownloadBaseUrl { get; set; } = "";
+        public string ModManifestUrl { get; set; } = "";
         public List<string> RequiredMods { get; set; } = new() { "@lifeexpensivemods", "@lifeexpensivemaps", "@modsmaps2024" };
 
         // Media (telecharges depuis le serveur boot)
         public string BackgroundUrl { get; set; } = "";
         public string VideoUrl { get; set; } = "";
-        public string TfrPluginUrl { get; set; } = "http://87.106.159.231/boot/task_force_radio.ts3_plugin";
+        public string TfrPluginUrl { get; set; } = "";
         public List<string> MusicUrls { get; set; } = new();
 
-        // Anti-triche
-        public string TokenSecret { get; set; } = "LE_PboCheck_S3cret_2024!";
+        // Anti-triche (ecrase par launcher_config.json distant)
+        public string TokenSecret { get; set; } = "CHANGE_ME";
 
         // Chemins locaux (sauves dans settings.json du joueur)
         public string ArmaPath { get; set; } = "";
